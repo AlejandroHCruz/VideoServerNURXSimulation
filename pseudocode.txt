@@ -1,0 +1,74 @@
+Declarar variables {
+	
+	matriz de solicitudes y si se rechazó o se aceptó
+	arreglo de usuarios // ¿un arreglo de frames por cliente?
+	matriz de frame, id (¿posición?) de los paquetes que pertenecen a dicho frame
+	matriz de paquetes, tamaño del paquete
+	matriz de framesEnviados, si llegó satisfactoriamente o no	
+	arreglo time of arrival (para cada paquete y frame?)
+	arreglo time of departure (para cada paquete y frame?)
+	int time = 0;
+
+	arreglos para LUWX
+	arreglo de bps?
+	arreglo booleano de lag?
+
+	random variable frameStart
+	read AmazonFile
+	frameArray = desde frameStart hasta 2000 frames más
+
+}
+
+main() {
+
+	while (frames procesados < 2000 ) {
+
+		// revisar qué eventos ocurren en este momento dado del tiempo
+		switch
+
+		 case 1: (time es enteramente divisible entre 2)
+		 		 	 Check delay and G probability of being rejected
+
+		 		 	 if (delay > 1 second) { rejected == true }
+
+		 		 	 if (!rejected) Meter una solicitud
+		 		 	 	 		 	 
+		 case 2: (time es enteramente divisible entre .01)
+		 		  	Enviar un frame al network layer
+
+		 case 3: (time es enteramente divisible entre .000222)
+		 		  	Sacar un cuadro del Buffer 
+		 		  	framesEnviados++; //que son frames procesados (ver libreta)
+
+		 		  	Multiplicar el cuadro que se está sacando por la probabilidad de error
+		 		  	
+		 		  	//something happens here
+
+		 		  	if (error) declarar que el frame y  llegará con error
+
+
+
+		//definir tamaño de paquetes
+		while (actualFrame => 1500) {
+			actualFrame-1500
+			i++
+		}
+
+		packages_of_frame = i
+
+		if (actualFrame != 0) { packages_of_frame++; }
+
+
+		Calcular LUWX
+		Guardar LUWX en sus arreglos
+
+
+		time++;
+	} 		  		
+
+
+	//Calcular LUWX final?
+	compute LUWX average cool shit and awesome statistics or do that later in excel?
+	print the arrays to a .csv file
+
+}
