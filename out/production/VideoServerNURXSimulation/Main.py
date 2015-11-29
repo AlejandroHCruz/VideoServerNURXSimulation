@@ -10,7 +10,7 @@ Lambda = 0.5                        # rate of requests entering the system every
 waitTimeMax = 1000000               # U. 1 second in microseconds = 1,000,000
 simulation_limit = 2000             # number of packages sent in the entire simulation
 frameLeavesApplicationLayer = .01   # r
-throughputFrames = 1/frameLeavesApplicationLayer  # number of frames going out of the application layer (1/r=100)
+throughputFrames = 1/frameLeavesApplicationLayer  # number of frames going out of the application layer (1/r)
 throughputPackages = 4500           # rate of packages leaving the buffer every second (Miu)
 requestArrivalTime = 1/Lambda       # Average time between any user request (tp)
 packageLeavesBufferTime = 1/throughputFrames    # Average time in which a package leaves the buffer
@@ -24,14 +24,13 @@ requestsTotal = 0                   # number of requests made to the server
 users = 0                           # number of users currently in the system.
 usersServed = 0                     # number of users that were well served by the system
 
-packagesInBuffer = 0                # number of packages currently in the system
+packagesInSystem = 0                # number of packages currently in the system
 framesInSystem = 0                  # number of frames currently in the system
 usersInSystem = 0                   # number of users currently in the system
 amazonCurrentDelay = 0              #
 amazonCurrentDelayCounter = 0       # used to read the delay from the delays array
-currentFrameSize = 0                    #
+currentFrame = 0                    #
 currentFrameCounter = 0             #
-packagesOfCurrentFrame = 0          #
 
 sp = 0                              # Integral of the number of packages in the system
 sf = 0                              # Integral of the number of frames in the system
@@ -85,7 +84,7 @@ for i in framesReader:
 
 # ====== Main ======
 
-while time < 600:  # Run simulation for 10 minutes
+while framesServed < 2000:
 
     time += 0.000001
 
@@ -101,36 +100,32 @@ while time < 600:  # Run simulation for 10 minutes
         if waitInBufferTime <= 1:
             usersInSystem += 1
             # get next currentFrameSize from framesArray
-            currentFrameSize = framesArray[currentFrameCounter]
+            currentFrame = framesArray[currentFrameCounter]
             currentFrameCounter += 1
             framesInSystem += 1
 
-        elif time % frameLeavesApplicationLayer == 0 & usersInSystem > 0:
-            # one frame leaves the application layer every .01 seconds
+        elif time % frameLeavesApplicationLayer == 0:
+        # one frame leaves the application layer every .01 seconds
+
+            packagesOfCurrentFrame = 0
 
             while currentFrameSize >= 1500:
-                # subdivide frames into packages
+
                 currentFrameSize - 1500
                 packagesOfCurrentFrame += 1
 
-            if currentFrameSize > 0:
+            if currentFrameSize != 0:
                 packagesOfCurrentFrame += 1
 
-            if packagesInBuffer+packagesOfCurrentFrame <= bufferSizeInPackages:
-                # send packages of one user to the network layer
-                if packagesOfCurrentFrame <= throughputFrames:
-                    packagesInBuffer += packagesOfCurrentFrame
-                else:
-                    packagesInBuffer += throughputFrames
-                    packagesOfCurrentFrame -= throughputFrames
-                    # TODO: logic to send the remaining packages the next millisecond
+            packagesInSystem += packagesOfCurrentFrame
 
-    elif time % packageLeavesBufferTime == 0 & packagesInBuffer > 0:
-        # one package leaves the buffer every .000222 seconds
-        packagesInBuffer -= 1
+    elif time % packageLeavesBufferTime == 0 & packagesInSystem > 0:
+        # one package leaves the buffer time every .000222 seconds
+
+        packagesInSystem -= 1
         # calculate W
         waitInBufferTime = 1/(4500 - packagesOfCurrentFrame) + amazonCurrentDelay
-        # TODO: check wifi user limit
+
 
 amazonCurrentDelayCounter += 1
 
