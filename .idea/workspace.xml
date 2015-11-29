@@ -2,33 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="09182094-969b-4ea7-aeb8-d74e950499e7" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/rsc/AmazonS3_delays-Ag-15.csv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/rsc/Terse_StarWarsIV_10.csv" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/alejandro.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/JaamSim2015-47.jar" afterPath="$PROJECT_DIR$/references/JaamSim2015-47.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/M-M-1-CB(claro).c" afterPath="$PROJECT_DIR$/references/M-M-1-CB(claro).c" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/M-M-N-CB.c" afterPath="$PROJECT_DIR$/references/M-M-N-CB.c" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/graphicalqueuedemo.gif" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/graphicalqueuedemo.gif" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/plotforbasicsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/plotforbasicsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/plotformixedsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/plotformixedsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/plotforoptimalsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/plotforoptimalsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/plotforselfishsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/plotforselfishsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/summarystatisticsforbasicsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/summarystatisticsforbasicsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/summarystatisticsformixedsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/summarystatisticsformixedsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/summarystatisticsforoptimalsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/summarystatisticsforoptimalsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/summarystatisticsforselfishsim.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/summarystatisticsforselfishsim.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/Images/varyingp.png" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/Images/varyingp.png" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/MM1Q.py" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/MM1Q.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/README.md" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/README.md" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/Simulating_Queues-master/graphicalMM1.py" afterPath="$PROJECT_DIR$/references/Simulating_Queues-master/graphicalMM1.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/class notes abuout simulation" afterPath="$PROJECT_DIR$/references/class notes abuout simulation" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/mm1-raul.c" afterPath="$PROJECT_DIR$/references/mm1-raul.c" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/referencias/public class MM1Queue.java" afterPath="$PROJECT_DIR$/references/public class MM1Queue.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.py" afterPath="$PROJECT_DIR$/src/Main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VideoServerNURXSimulation.iml" afterPath="$PROJECT_DIR$/VideoServerNURXSimulation.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="VideoServerNURXSimulation.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -54,8 +28,8 @@
       <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.48872182">
-              <caret line="51" column="42" selection-start-line="51" selection-start-column="42" selection-end-line="51" selection-end-column="42" />
+            <state vertical-scroll-proportion="0.7791798">
+              <caret line="106" column="50" selection-start-line="106" selection-start-column="50" selection-end-line="106" selection-end-column="50" />
               <folding />
             </state>
           </provider>
@@ -100,7 +74,7 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="-930" />
+    <option name="y" value="-30" />
     <option name="width" value="1366" />
     <option name="height" value="798" />
   </component>
@@ -623,15 +597,15 @@
       <created>1448763513437</created>
       <option name="number" value="Default" />
       <updated>1448763513437</updated>
-      <workItem from="1448763517997" duration="10035000" />
+      <workItem from="1448763517997" duration="19704000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10035000" />
+    <option name="totallyTimeSpent" value="19704000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-930" width="1366" height="798" extended-state="6" />
+    <frame x="0" y="-30" width="1366" height="798" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -676,8 +650,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.48872182">
-          <caret line="51" column="42" selection-start-line="51" selection-start-column="42" selection-end-line="51" selection-end-column="42" />
+        <state vertical-scroll-proportion="0.7791798">
+          <caret line="106" column="50" selection-start-line="106" selection-start-column="50" selection-end-line="106" selection-end-column="50" />
           <folding />
         </state>
       </provider>
