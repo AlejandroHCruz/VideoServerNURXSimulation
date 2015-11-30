@@ -68,12 +68,14 @@ bandwidthArray = []                 # bits transferred every second
 packagesInBufferArray = []          # array of the number of packages in the system
 framesInSystemArray = []            # array of the number of frames in the system
 usersInSystemArray = []             # array of the number of users in the system
+startStreamingPositionPerUser = []  # in which position of the framesArray every user starts
 
 # Historical & Control Arrays
 packagesPerFrameArray = []          # history of how many packages has every frame processed
 frameSequenceByUserServed = []      # list of users by frame processed
 framesServedPerUser = []            # history of how many frames have been served for each user
 waitInBufferTimePerPackage = []     # history of how many seconds ech petition waited in buffer
+framesPendingToBeServedPerUser = []  # count of how many frames each user needs to receive to achieve 2000
 
 printableResults = []               # array of arrays with everything that's relevant for further statistical analysis
 
