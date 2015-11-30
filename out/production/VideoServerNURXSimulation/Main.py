@@ -7,30 +7,35 @@ import csv
 
 # Static constants
 Lambda = 0.5                        # rate of requests entering the system every second (1/tp)
-waitTimeMax = 1000000               # U. 1 second in microseconds = 1,000,000
-simulation_limit = 2000             # number of packages sent in the entire simulation
+waitTimeMax = 1                     # U. 1 second in seconds
+simulationTime = 600                # Time the simulation will run
+packagesTobeServedPerUser = 2000    # number of packages that every user receives
 frameLeavesApplicationLayer = .01   # r
-throughputFrames = 1/frameLeavesApplicationLayer  # number of frames going out of the application layer (1/r)
+throughputFrames = 1/frameLeavesApplicationLayer  # number of frames going out of the application layer (1/r= 100)
 throughputPackages = 4500           # rate of packages leaving the buffer every second (Miu)
-requestArrivalTime = 1/Lambda       # Average time between any user request (tp)
-packageLeavesBufferTime = 1/throughputFrames    # Average time in which a package leaves the buffer
+requestArrivalTime = 1/Lambda       # Average time between any user request (tp = 2)
+packageLeavesBufferTime = 1/throughputPackages    # Average time in which a package leaves the buffer = .000222 seconds
+wifiUserLimit = 52                  #
 
 bufferSizeInPackages = 50           # n { 50, 100, 250 & 500 }
 
 # Variables
-time = 0                            # current simulation time in seconds
-framesServed = 0                 # frames that were served through the system
-requestsTotal = 0                   # number of requests made to the server
 users = 0                           # number of users currently in the system.
-usersServed = 0                     # number of users that were well served by the system
+time = 0                            # current simulation time in seconds
 
-packagesInSystem = 0                # number of packages currently in the system
+requestsTotal = 0                   # number of requests made to the server
+usersServed = 0                     # number of users that were well served by the system
+framesServed = 0                    # frames that were served through the system
+packagesServed = 0                  # packages that were served through the system
+
+packagesInBuffer = 0                # number of packages currently in the system
 framesInSystem = 0                  # number of frames currently in the system
 usersInSystem = 0                   # number of users currently in the system
 amazonCurrentDelay = 0              #
 amazonCurrentDelayCounter = 0       # used to read the delay from the delays array
-currentFrame = 0                    #
+currentFrameSize = 0                #
 currentFrameCounter = 0             #
+packagesOfCurrentFrame = 0          #
 
 sp = 0                              # Integral of the number of packages in the system
 sf = 0                              # Integral of the number of frames in the system
@@ -43,7 +48,7 @@ lu = 0                              # total users in system
 serviceTime = 0                     # total service time in seconds (occupation time)
 utilization = 0                     # percentage of utilization of the system
 delay = 0                           #
-waitInBufferTime = 0                  #
+waitInBufferTime = 0                #
 
 probabilityServerSaturation = 0     # G
 probabilityPackageSendFail = .001*usersInSystem  # e
@@ -56,15 +61,21 @@ departureTimeFramesArray = []            # time in which every frame left the sy
 arrivalTimePackagesArray = []            # time in which every package entered the system
 departureTimePackagesArray = []          # time in which every package left the system
 
-frameSequenceByUserServed = []           # list of users by frame processed
-
 framesArray = []                    # the video frames to be served (from the .csv file)
 amazonDelaysArray = []              # Amazon delays from the .csv file
-bandwidth = []                      # bits transferred every second
+bandwidthArray = []                 # bits transferred every second
 
-npArray = []                        # array of the number of packages in the system
-nfArray = []                        # array of the number of frames in the system
-nuArray = []                        # array of the number of users in the system
+packagesInBufferArray = []          # array of the number of packages in the system
+framesInSystemArray = []            # array of the number of frames in the system
+usersInSystemArray = []             # array of the number of users in the system
+startStreamingPositionPerUser = []  # in which position of the framesArray every user starts
+
+# Historical & Control Arrays
+packagesPerFrameArray = []          # history of how many packages has every frame processed
+frameSequenceByUserServed = []      # list of users by frame processed
+framesServedPerUser = []            # history of how many frames have been served for each user
+waitInBufferTimePerPackage = []     # history of how many seconds ech petition waited in buffer
+framesPendingToBeServedPerUser = []  # count of how many frames each user needs to receive to achieve 2000
 
 printableResults = []               # array of arrays with everything that's relevant for further statistical analysis
 
@@ -84,7 +95,7 @@ for i in framesReader:
 
 # ====== Main ======
 
-while framesServed < 2000:
+while time < simulationTime:  # Run simulation for "10 minutes"
 
     time += 0.000001
 
@@ -100,34 +111,57 @@ while framesServed < 2000:
         if waitInBufferTime <= 1:
             usersInSystem += 1
             # get next currentFrameSize from framesArray
-            currentFrame = framesArray[currentFrameCounter]
+            currentFrameSize = framesArray[currentFrameCounter]
             currentFrameCounter += 1
             framesInSystem += 1
 
-        elif time % frameLeavesApplicationLayer == 0:
-        # one frame leaves the application layer every .01 seconds
-
-            packagesOfCurrentFrame = 0
+        elif time % frameLeavesApplicationLayer == 0 & usersInSystem > 0:
+            # one frame leaves the application layer every .01 seconds
 
             while currentFrameSize >= 1500:
-
+                # subdivide frames into packages
                 currentFrameSize - 1500
                 packagesOfCurrentFrame += 1
 
-            if currentFrameSize != 0:
+            if currentFrameSize > 0:
                 packagesOfCurrentFrame += 1
 
-            packagesInSystem += packagesOfCurrentFrame
+            packagesPerFrameArray.append(packagesOfCurrentFrame)
 
-    elif time % packageLeavesBufferTime == 0 & packagesInSystem > 0:
-        # one package leaves the buffer time every .000222 seconds
+            # TODO: serve only 52 users - wifiLimit - (framesServedPerUser[] < 2000), the other ones wait
 
-        packagesInSystem -= 1
+            if packagesInBuffer+packagesOfCurrentFrame <= bufferSizeInPackages:
+                # send packages of one user to the network layer
+                packagesInBuffer += packagesOfCurrentFrame
+
+                # if packagesOfCurrentFrame <= throughputFrames:
+                #     packagesInBuffer += packagesOfCurrentFrame
+                # else:
+                #     packagesInBuffer += throughputFrames
+                #     packagesOfCurrentFrame -= throughputFrames
+                #     # TOD O: logic to send the remaining packages the next millisecond
+
+    elif time % packageLeavesBufferTime == 0 & packagesInBuffer > 0:
+        # one package leaves the buffer every .000222 seconds
+        departureTimePackagesArray.append(time)
+        packagesInBuffer -= 1
         # calculate W
         waitInBufferTime = 1/(4500 - packagesOfCurrentFrame) + amazonCurrentDelay
+        probabilityPackageSendFail = probabilityPackageSendFail = .001*usersInSystem
 
+        # TODO: when all the packages of one frame are served:
+        # framesInSystem -= 1, departureTimeFramesArray.append(time)
+
+        # TODO: when 2000 frames of one user are served:
+        # usersServed += 1, usersInSystem -= 1, departureTimeUsersArray.append(time)
 
 amazonCurrentDelayCounter += 1
+
+# ====== Compute LUWX ======
+
+
+
+printableResults = [usersInSystem]
 
 with open("results.csv", "w") as f:
     writer = csv.writer(f)
