@@ -42,12 +42,16 @@ amazonCurrentDelay = 0              #
 amazonCurrentDelayCounter = 0       # used to read the delay from the delays array
 currentFrameSize = 0                #
 currentFrameCounter = 0             #
-numPackagesOfCurrentFrame = 0          #
+numPackagesOfCurrentFrame = 0       #
+servedPackagesOfCurrentFrame = 0    #
+packagesArrivedWithError = 0
+framesArrivedWithError = 0
+usersServedWithError = 0
 
-
-sp = 0                              # Integral of the number of packages in the system
-sf = 0                              # Integral of the number of frames in the system
-su = 0                              # Integral of the number of users in the system
+# Not needed since I have packagesInBuffer, framesInSystem and usersInSystem
+# sp = 0                              # Integral of the number of packages in the system
+# sf = 0                              # Integral of the number of frames in the system
+# su = 0                              # Integral of the number of users in the system
 
 lp = 0                              # total packages in system
 lf = 0                              # total frames in system
@@ -60,6 +64,7 @@ waitInBufferTime = 0                #
 
 probabilityServerSaturation = 0     # G
 probabilityPackageSendFail = eDividedByK*usersInSystem  # e
+randomE = 0                         # to compare e with and determine if a package arrives successfully to client
 
 # Arrays
 arrivalTimeUsersArray = []       # time in which every request that reaches the system arrived
@@ -73,6 +78,7 @@ probabilityServerSaturationArr = []      # G
 probabilityPackageSendFailArr = []       # e
 
 framesArray = []                    # the video frames to be served (from the .csv file)
+framesServed = []                   # frames that came out of the system
 amazonDelaysArray = []              # Amazon delays from the .csv file
 bandwidthArray = []                 # bits transferred every second
 
@@ -80,20 +86,23 @@ bandwidthArray = []                 # bits transferred every second
 # framesInSystemArray = []            # array of the number of frames in the system
 # usersInSystemArray = []             # array of the number of users in the system
 startStreamingPositionPerUser = []    # in which position of the framesArray every user starts
-currentFrameCounterPerUser = []
+currentFrameCounterPerUser = []       # to know which frame is being served to every user
 frameAcceptedInBufferStatus = []      # to save which frames were taken or rejected of the buffer
 
 # Historical & Control Arrays
 packagesPerFrameArray = []            # history of how many packages has every frame processed
-frameSequenceByUserServedArr = []     # list of users by frame processed
-framesServedPerUserArray = []         # history of how many frames have been served for each user
+frameOwnersArray = []                 # list of users by frame in the system (owner)
 waitInBufferTimePerPackageArr = []    # history of how many seconds ech petition waited in buffer
-framesSentPerUserArray = []           # count of how many frames each user has received, up to 2000
+framesReceivedPerUserArray = []       # count of how many frames each user has received, up to 2000
 
-packagesInBufferArr = 0                # history of the number of packages in the system
-framesInSystemArr = 0                  # history of the number of frames in the system
-usersInSystemArr = 0                   # history of the number of users in the system
-usersBeingServedArr = 0                # history of the users being served in the moment
+packagesInBufferArr = []               # history of the number of packages in the system
+framesInSystemArr = []                 # history of the number of frames in the system
+usersInSystemArr = []                  # history of the number of users in the system
+usersBeingServedArr = []               # history of the users being served in the moment
+
+packagesFinalStatusArr = []            # accepted or rejected
+framesFinalStatusArr = []              # accepted or rejected
+usersFinalStatusArr = []               # accepted or rejected
 
 printableResults = []               # array of arrays with everything that's relevant for further statistical analysis
 
@@ -126,7 +135,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         usersInSystem += 1
         arrivalTimeUsersArray.append(time)
         # userBeingServed = len(arrivalTimeUsersRequestsArray) - 1
-        framesSentPerUserArray.append(0)
+        framesReceivedPerUserArray.append(0)
         startStreamingPositionPerUser.append(random.randrange(randomFrameRangeMin, randomFrameRangeMax))
         currentFrameCounterPerUser.append(0)
 
@@ -139,7 +148,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         # serve only 256 users - wifiLimit - (framesServedPerUser[] < 2000), the other ones wait
         if usersBeingServed < wifiUserLimit:
             # find next user in the array that still needs to receive one of the 2000 frames
-            for index, item in enumerate(framesSentPerUserArray):
+            for index, item in enumerate(framesReceivedPerUserArray):
                 if item <= packagesTobeServedPerUser & index > userBeingServed:
                     userBeingServed = index  # get the user :)
 
@@ -147,6 +156,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
                     currentFrameCounter = currentFrameCounterPerUser[userBeingServed]
                     currentFrameSize = framesArray[currentFrameCounter]
 
+                    frameOwnersArray.append(userBeingServed)
                     usersBeingServed += 1
         else:
             userBeingServed = 0
@@ -162,6 +172,9 @@ while time < simulationTime:  # Run simulation for "10 minutes"
 
     elif time % frameLeavesApplicationLayer == 0 & usersInSystem > 0:
         # one frame leaves the application layer every .01 seconds and enters the buffer
+
+        # TODO: Check G
+        # TODO: Compute G = packagesFailed/PackagesServed
 
         if waitInBufferTime <= 1 & packagesInBuffer+numPackagesOfCurrentFrame <= bufferSizeInPackages:
             # send packages of one user to the network layer
@@ -183,6 +196,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         else:
             frameAcceptedInBufferStatus.append("rejected")
             framesRejectedFromBuffer += 1
+            # TODO: marcar todos los paquetes como rechazados (no añadir paquetes al sistema)
 
         currentFrameCounter += 1
         currentFrameCounterPerUser[userBeingServed] = currentFrameCounter
@@ -193,20 +207,38 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         departureTimePackagesArray.append(time)
         packagesInBuffer -= 1
         packagesServed += 1
+        servedPackagesOfCurrentFrame += 1
 
-        # calculate W
+        # compute W
         waitInBufferTime = 1/(4500 - numPackagesOfCurrentFrame) + amazonCurrentDelay
+        # compute and save e
         probabilityPackageSendFail = eDividedByK*usersInSystem
+        probabilityPackageSendFailArr.append(probabilityPackageSendFail)
 
-        # Follow-up of the packages->frames->users
-        # TODO: when all the packages of one frame are served:
-        # Get last served frame from the array, compute sumatoria del array y comparar con servedFrames. Si se completó otro marcarlo como servido
-        lastFrameServed = framesServed[-1]
+        # check e
+        randomE = round(random.uniform(0, 1), 4)  # probability with 4 decimals
+        if randomE > probabilityPackageSendFail:
+            packagesFinalStatusArr.append("success")
+        else:
+            packagesFinalStatusArr.append("error")
+            packagesArrivedWithError += 1
 
+        # === Follow-up of the packages->frames->users final status and departure times ===
+
+        # When all the packages of one frame are served
+        if servedPackagesOfCurrentFrame == numPackagesOfCurrentFrame:
+            framesServed.append(currentFrameCounter)  # this array might be unnecessary
+            departureTimeFramesArray.append(time)
+            servedPackagesOfCurrentFrame = 0
+
+            # TODO: Search for one "error" in the packagesFinalStatusArr from ___ to numPackagesOfCurrentFrame later
+
+        # what is this?
         packs = 0
         for numOfPackages in packagesPerFrameArray:
             if packagesServed < packs:
-                packs += numOfPackages
+                packs += numOfPackages  # wtf!
+
         # framesInSystem -= 1, departureTimeFramesArray.append(time)
 
         # TODO: when 2000 frames of one user are served:
@@ -214,11 +246,16 @@ while time < simulationTime:  # Run simulation for "10 minutes"
 
 amazonCurrentDelayCounter += 1
 
-# ====== Compute LUWX ======
+# ====== Compute LU ======
 
+lp = (packagesServed+packagesInBuffer)/time  # also compute this in excel
+lf = (framesServed+framesInSystem)/time      # also compute this in excel
+lu = (usersServed+usersInSystem)/time        # also compute this in excel
 
 
 printableResults = [usersInSystem]
+
+# TODO: Print 2 csv files
 
 with open("results.csv", "w") as f:
     writer = csv.writer(f)

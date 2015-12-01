@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="28" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="29" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="30" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="31" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="51" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="52" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="53" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="76" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="80" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="79" />
-    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="78" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="55" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="56" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="57" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="82" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="86" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="85" />
+    <bookmark url="file://$PROJECT_DIR$/src/Main.py" line="84" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="09182094-969b-4ea7-aeb8-d74e950499e7" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.py" afterPath="$PROJECT_DIR$/src/Main.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dbnavigator.xml" afterPath="$PROJECT_DIR$/.idea/dbnavigator.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="VideoServerNURXSimulation.iws" />
@@ -52,8 +47,8 @@
       <file leaf-file-name="Main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.512987">
-              <caret line="151" column="26" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="26" />
+            <state vertical-scroll-proportion="2.7272727">
+              <caret line="134" column="26" selection-start-line="134" selection-start-column="26" selection-end-line="134" selection-end-column="26" />
               <folding>
                 <element signature="e#64#74#0" expanded="true" />
               </folding>
@@ -191,7 +186,7 @@
     <property name="recentsLimit" value="5" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="FullScreen" value="true" />
+    <property name="FullScreen" value="false" />
   </component>
   <component name="RunManager" selected="Python.Main">
     <configuration default="false" name="Main" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -662,12 +657,12 @@
       <workItem from="1448763517997" duration="47009000" />
       <workItem from="1448865290430" duration="234000" />
       <workItem from="1448865566849" duration="119000" />
-      <workItem from="1448865727253" duration="19661000" />
+      <workItem from="1448865727253" duration="30293000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67023000" />
+    <option name="totallyTimeSpent" value="77655000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -830,8 +825,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.512987">
-          <caret line="151" column="26" selection-start-line="151" selection-start-column="26" selection-end-line="151" selection-end-column="26" />
+        <state vertical-scroll-proportion="2.7272727">
+          <caret line="134" column="26" selection-start-line="134" selection-start-column="26" selection-end-line="134" selection-end-column="26" />
           <folding>
             <element signature="e#64#74#0" expanded="true" />
           </folding>
