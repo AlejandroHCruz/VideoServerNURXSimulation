@@ -53,6 +53,7 @@ usersServedWithError = 0
 # sf = 0                              # Integral of the number of frames in the system
 # su = 0                              # Integral of the number of users in the system
 
+# TODO: check this variables for duplicates
 lp = 0                              # total packages in system
 lf = 0                              # total frames in system
 lu = 0                              # total users in system
@@ -131,7 +132,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
 
     if time % requestArrivalTime == 0:
         # one request arrives every 2 seconds, add one user to the system
-        requestsTotal += 1
+
+        # requestsTotal += 1  # the user does not generate a request the moment it arrives
         usersInSystem += 1
         arrivalTimeUsersArray.append(time)
         # userBeingServed = len(arrivalTimeUsersRequestsArray) - 1
@@ -144,6 +146,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         # starting on second 2, every 1/24 seconds a user asks for a frame
         framesInSystem += 1
         arrivalTimeFramesArray.append(time)
+
+        # TODO: for each clientsInSystem, add one frame to the system
 
         # serve only 256 users - wifiLimit - (framesServedPerUser[] < 2000), the other ones wait
         if usersBeingServed < wifiUserLimit:
@@ -170,11 +174,12 @@ while time < simulationTime:  # Run simulation for "10 minutes"
 
         # for user in arrivalTimeUsersArray:
 
+    # TODO: Remove this if and reposition its code into "elif time > 2 & time-2 % 1/fps == 0:"
     elif time % frameLeavesApplicationLayer == 0 & usersInSystem > 0:
         # one frame leaves the application layer every .01 seconds and enters the buffer
 
-        # TODO: Check G
         # TODO: Compute G = packagesFailed/PackagesServed
+        # TODO: Control G
 
         if waitInBufferTime <= 1 & packagesInBuffer+numPackagesOfCurrentFrame <= bufferSizeInPackages:
             # send packages of one user to the network layer
@@ -196,10 +201,10 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         else:
             frameAcceptedInBufferStatus.append("rejected")
             framesRejectedFromBuffer += 1
-            # TODO: marcar todos los paquetes como rechazados (no añadir paquetes al sistema)
+            # TODO: marcar todos los paquetes como rechazados, además no añadir paquetes al sistema
 
         currentFrameCounter += 1
-        currentFrameCounterPerUser[userBeingServed] = currentFrameCounter
+        currentFrameCounterPerUser[userBeingServed] = currentFrameCounter  # TODO: Check how this arrays work
 
     elif time % packageLeavesBufferTime == 0 & packagesInBuffer > 0:
         # one package leaves the buffer every .000222 seconds
@@ -226,6 +231,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         # === Follow-up of the packages->frames->users final status and departure times ===
 
         # When all the packages of one frame are served
+        # TODO: Check the logic of this if
         if servedPackagesOfCurrentFrame == numPackagesOfCurrentFrame:
             framesServed.append(currentFrameCounter)  # this array might be unnecessary
             departureTimeFramesArray.append(time)
