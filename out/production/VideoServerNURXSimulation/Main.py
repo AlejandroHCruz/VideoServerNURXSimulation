@@ -4,7 +4,7 @@ __author__ = 'Alejandro Hdz. Cruz'
 # Imports
 import csv
 import random
-import numpy as np
+import numpy as np  # install in your computer: http://stackoverflow.com/questions/1273203/cant-import-numpy-in-python
 
 # ====== Declare global variables ======
 
@@ -182,7 +182,6 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
 while time < simulationTime:  # Run simulation for "10 minutes"
 
     # save system's status (saving this might be too much data and we should save it every .01 seconds)
-    # TODO: save one csv for this data (every entry is a microsecond)
     usersInSystemArr.append(usersInSystem)
     usersBeingServedArr.append(usersBeingServed)
     framesInSystemArr.append(framesInSystem)
@@ -239,6 +238,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         packagesServedPerFrameArr.append(0)
         frameOwnersArr.append(currentUserIndex)
         frameSizeArr.append(currentFrameSize)
+        print time, ": CurrentFrameSize: ", currentFrameSize
 
         usersBeingServed += 1
 
@@ -287,7 +287,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         else:
             # accept the frame in the system
             framesInSystem += 1
-            print time, ": Frame added. Size:", currentFrameSize, " - Total: ", framesInSystem, "..."
+            print time, ": Frame added. - Total: ", framesInSystem, "..."
             packagesInSystemArr.append("yes")
             framesAcceptedInBuffer += 1
             framesAcceptedInBufferArr.append("accepted")
@@ -428,7 +428,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
 
 
 # ====== Compute L & U ======
-1
+
 # average of objects in the system
 lp = (packagesServed+packagesInSystem)/time
 lf = (framesServed+framesInSystem)/time

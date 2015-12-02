@@ -238,6 +238,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         packagesServedPerFrameArr.append(0)
         frameOwnersArr.append(currentUserIndex)
         frameSizeArr.append(currentFrameSize)
+        print time, ": CurrentFrameSize: ", currentFrameSize
 
         usersBeingServed += 1
 
@@ -286,7 +287,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         else:
             # accept the frame in the system
             framesInSystem += 1
-            print time, ": Frame added. Size:", currentFrameSize, " - Total: ", framesInSystem, "..."
+            print time, ": Frame added. - Total: ", framesInSystem, "..."
             packagesInSystemArr.append("yes")
             framesAcceptedInBuffer += 1
             framesAcceptedInBufferArr.append("accepted")
