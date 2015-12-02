@@ -70,7 +70,8 @@ framesRejectedFromBuffer = 0        # frames that waited more than 1 second
 framesDelivered = 0                 #
 framesNotDelivered = 0              #
 currentFrameSize = 0                #
-currentFrameIndex = 0               #
+currentFrameIndex = 0               # id of the frame being sent to the user
+currentFrameStreamingIndex = 0      # position of the original frame sequence being streamed to the current user
 numPackagesOfCurrentFrame = 0       #
 servedPackagesOfCurrentFrame = 0    #
 lastFrameServed = -1                #
@@ -135,7 +136,8 @@ usersFullyDeliveredArr = []         # yes or no, depending on it's packages e ch
 # frames
 arrivalTimeFramesArr = []           # time in which every frame entered the system
 departureTimeFramesArr = []         # time in which every frame left the system
-framesArray = []                    # all the video frames that can be served (from the .csv file)
+framesArray = []                    # sequence of the frames to be served
+framesOriginalArray = []            # all the video frames that can be served (from the .csv file)
 framesInSystemArr = []              # history of the number of frames in the system
 # framesServed = []                 # frames that came out of the system
 frameSizeArr = []
@@ -150,8 +152,8 @@ arrivalTimePackagesArr = []         # time in which every package entered the sy
 departureTimePackagesArray = []     # time in which every package left the system
 packagesArray = []                  # Sequence of the packages
 packagesInSystemArr = []            # history of the number of packages in the system
-packagesAcceptedInBufferArr = []    # yes or no, depending on the error e
-packagesDeliveryStatusArr = []      # accepted or rejected
+packagesAcceptedInBufferArr = []    # accepted or rejected, depending on the error e
+packagesDeliveryStatusArr = []      # delivered or failed
 packageSizeArr = []                 #
 packageOwnersArr = []               # user that will needs every package
 frameOfEveryPackage = []            # to know of which frame every package is part of
@@ -171,11 +173,7 @@ for i in delaysReader:
 
 framesReader = csv.reader(open('/mnt/5512B8C217C7CAC1/Dropbox/Desarrollo/Python/VideoServerNURXSimulation/rsc/Terse_DieHardIII.csv', 'rb'), delimiter= ',', quotechar='"')
 for i in framesReader:
-    framesArray.append(i)
-
-# function to compare floats with python 2
-def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+    framesOriginalArray.append(i)
 
 # ====== Main ======
 
@@ -204,6 +202,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         usersInSystem += 1
         print time, ": user added. Total: ", usersInSystem
         arrivalTimeUsersArr.append(time)
+        usersFullyDeliveredArr.append("no")
         framesDeliveredPerUserArr.append(0)
         startStreamingPositionPerUser.append(random.randrange(randomFrameRangeMin, randomFrameRangeMax))
         currentFramePerUserIndex.append(0)
@@ -221,21 +220,24 @@ while time < simulationTime:  # Run simulation for "10 minutes"
                     currentUserIndex = index
 
         # get index of next currentFrame for current user
-        currentFrameIndex = currentFramePerUserIndex[currentUserIndex]
+        # nextFrameForThisUser = framesOriginalArray[currentFramePerUserIndex[currentUserIndex] + startStreamingPositionPerUser[currentUserIndex]]
+        # this shouldn't fail because the randomFrameRangeMax is the frame sequence - 2000
+        currentFrameStreamingIndex = currentFramePerUserIndex[currentUserIndex]
 
-        if currentFrameIndex == 0:
-            currentFrameIndex += startStreamingPositionPerUser[currentUserIndex]
+        if currentFrameStreamingIndex == 0:
+            currentFrameStreamingIndex += startStreamingPositionPerUser[currentUserIndex]
         else:
-            currentFrameIndex += 1
+            currentFrameStreamingIndex += 1
 
         # save new currentFrameIndex for this user
-        currentFramePerUserIndex[currentUserIndex] = currentFrameIndex
+        currentFramePerUserIndex[currentUserIndex] = currentFrameStreamingIndex
 
         # add frame to the system
-        currentFrameSize = framesArray[currentFrameIndex]
+        currentFrameSize = framesOriginalArray[currentFrameStreamingIndex]
         currentFrameSize = np.int32(currentFrameSize)
         arrivalTimeFramesArr.append(time)
         packagesServedPerFrameArr.append(0)
+        framesFullyDeliveredArr.append("no")
         frameOwnersArr.append(currentUserIndex)
         frameSizeArr.append(currentFrameSize)
         print time, ": CurrentFrameSize: ", currentFrameSize
@@ -281,14 +283,12 @@ while time < simulationTime:  # Run simulation for "10 minutes"
                 packagesRejectedFromBuffer += 1
                 packagesAcceptedInBufferArr.append("rejected")
                 packagesDeliveryStatusArr.append("-")
-                packagesInSystemArr.append("no")
                 rej += 1
 
         else:
             # accept the frame in the system
             framesInSystem += 1
             print time, ": Frame added. - Total: ", framesInSystem, "..."
-            packagesInSystemArr.append("yes")
             framesAcceptedInBuffer += 1
             framesAcceptedInBufferArr.append("accepted")
 
@@ -313,8 +313,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         inx = 0
         # find next package in system
         while isInSys is False:
-            packageInSystemStatus = packagesInSystemArr[inx]
-            if packageInSystemStatus is "yes":
+            packageInSystemStatus = packagesAcceptedInBufferArr[inx]
+            if packageInSystemStatus is "accepted":
                 currentPackageIndex = inx
                 isInSys = True
                 # Compute bandwidth
@@ -326,7 +326,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         packagesInSystem -= 1
         print time, ": Package served. Total: ", packagesInSystem
         packagesServed += 1
-        packagesInSystemArr[currentPackageIndex] = "not anymore"  # package was served
+        packagesAcceptedInBufferArr[currentPackageIndex] = "served"  # package was served
 
         # we need cpi to get arrivalTime of package that entered the system
         cpi = 0
@@ -345,10 +345,10 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         # get this package's user and frame
         currentFrameIndex = frameOfEveryPackage[currentPackageIndex]
         currentUserIndex = packageOwnersArr[currentPackageIndex]
-        numPackagesOfCurrentFrame = packagesPerFrameArr[currentFrameIndex]
+        numPackagesOfCurrentFrame = np.int32(packagesPerFrameArr[currentFrameIndex])
 
         # compute waiting time in Buffer/System
-        delay = 1/(4500 - numPackagesOfCurrentFrame) + amazonCurrentDelay
+        delay = 1/(4500 - numPackagesOfCurrentFrame) + np.float64(amazonCurrentDelay)
         # delay = departureTimePackagesArray[currentPackageIndex] - arrivalTimePackagesArr[currentPackageIndex]
         # delay += amazonCurrentDelay
 
@@ -356,18 +356,18 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         e = eDividedByK*usersInSystem
         randomE = round(random.uniform(0, 1), 4)  # probability with 4 decimals
         if randomE > e:
-            packagesDeliveryStatusArr.append("success")
+            packagesDeliveryStatusArr.append("delivered")
             packagesDelivered += 1
             packagesSuccess += 1
 
             # tag package's frame
-            if framesFullyDeliveredArr[currentFrameIndex] != "no":
+            if framesFullyDeliveredArr[currentFrameIndex] is not "no":
                 framesFullyDeliveredArr[currentFrameIndex] = "yes"
             # tag package's user
-            if usersFullyDeliveredArr[currentUserIndex] != "no":
+            if usersFullyDeliveredArr[currentUserIndex] is not "no":
                 usersFullyDeliveredArr[currentUserIndex] = "yes"
         else:
-            packagesDeliveryStatusArr.append("error")
+            packagesDeliveryStatusArr.append("failed")
             packagesFailed += 1
             packagesNotDelivered += 1
             # tag package's frame
