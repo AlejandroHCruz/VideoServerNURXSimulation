@@ -56,7 +56,6 @@ usersNotDelivered = 0               # these users received a corrupt video (with
 usersBeingServed = 0                # users being served in any moment (max 256)
 currentUserIndex = 0                # position that the current user has in the users/petitions array
 servedFramesOfCurrentUser = 0       #
-lastUserServed = -1                 #
 
 lu = 0                              # average of users in system
 
@@ -187,6 +186,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
     bandwidthArr.append(currentBandwidth)
     probabilityServerSaturationArr.append(G)
     probabilityPackageSendFailArr.append(e)
+    timeInBufferPerPackageArr.append(timeInBuffer)
     delayArr.append(delay)
 
     time += 0.000001
@@ -348,7 +348,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         numPackagesOfCurrentFrame = np.int32(packagesPerFrameArr[currentFrameIndex])
 
         # compute waiting time in Buffer/System
-        delay = 1/(4500 - numPackagesOfCurrentFrame) + np.float64(amazonCurrentDelay)
+        timeInBuffer = 1/(4500 - numPackagesOfCurrentFrame)
+        delay = timeInBuffer + np.float64(amazonCurrentDelay)
         # delay = departureTimePackagesArray[currentPackageIndex] - arrivalTimePackagesArr[currentPackageIndex]
         # delay += amazonCurrentDelay
 
@@ -438,8 +439,72 @@ utilizationPackage = serviceTimePackage/time
 utilizationFrame = serviceTimeFrame/time
 utilizationUser = serviceTimeUser/time
 
-# TODO: Print all csv files
+# ======= Print all csv files ======
 
-with open("results.csv", "w") as f:
+with open("general_info.csv", "w") as f:
     writer = csv.writer(f)
-    # writer.writerows(printableResults)
+    row = [time, usersInSystem, usersServed, usersSuccess, usersFailed, usersAcceptedInBuffer, usersRejectedFromBuffer, usersDelivered, usersNotDelivered, usersBeingServed, lu, lf, lp, utilizationPackage, utilizationFrame, utilizationUser]
+    writer.writerows(row)
+
+rows = []
+
+with open("users.csv", "w") as f:
+    writer = csv.writer(f)
+    for index, t in enumerate(arrivalTimeUsersArr):
+            arrTUsr = arrivalTimeUsersArr[index]
+            depTUsr = departureTimeUsersArr[index]
+            startStr = startStreamingPositionPerUser[index]
+            frDeliv = framesDeliveredPerUserArr[index]
+            currFr = currentFramePerUserIndex[index]
+            accBuff = usersAcceptedInBufferArr[index]
+            fullDeliv = usersFullyDeliveredArr[index]
+            row = [arrTUsr, depTUsr, startStr, frDeliv, currFr, accBuff, fullDeliv]
+            rows.append(row)
+    writer.writerows(row)
+
+with open("frames.csv", "w") as f:
+    writer = csv.writer(f)
+    for index, t in enumerate(arrivalTimeFramesArr):
+        arrTFr = arrivalTimeFramesArr[index]
+        depTFr = departureTimeFramesArr[index]
+        frameIndx = framesArray[index]
+        frSize = frameSizeArr[index]
+        owner = frameOwnersArr[index]
+        accBuff = framesAcceptedInBufferArr[index]
+        fullDeliv = framesFullyDeliveredArr[index]
+        packsFr = packagesPerFrameArr[index]
+        packsServFr = packagesServedPerFrameArr[index]
+        row = [arrTFr, depTFr, frameIndx, frSize, owner, accBuff, fullDeliv, packsFr, packsServFr]
+        rows.append(row)
+    writer.writerows(row)
+
+with open("packages.csv", "w") as f:
+    writer = csv.writer(f)
+    for index, t in enumerate(arrivalTimePackagesArr):
+        arrTPack = arrivalTimePackagesArr[index]
+        depTPack = departureTimePackagesArray[index]
+        packageIndx = packagesArray[index]
+        packSize = packageSizeArr[index]
+        owner = packageOwnersArr[index]
+        accBuff = packagesAcceptedInBufferArr[index]
+        deliverySts = packagesDeliveryStatusArr[index]
+        row = [arrTPack, depTPack, packageIndx, packSize, owner, accBuff, deliverySts]
+        rows.append(row)
+    writer.writerows(row)
+
+with open("every_microsecond_data.csv", "w") as f:
+    writer = csv.writer(f)
+for index, i in enumerate(usersInSystemArr):
+    uinSys = usersInSystemArr[index]
+    uBingServed = usersBeingServed[index]
+    frInSys = framesInSystemArr[index]
+    packInSys = packagesInSystemArr[index]
+    probG = probabilityServerSaturationArr[index]
+    probE = probabilityPackageSendFailArr[index]
+    tBuff = timeInBufferPerPackageArr[index]
+    dlay = delayArr[index]
+    bn = bandwidthArr[index]
+    row = [uinSys, uBingServed, frInSys, packInSys, probG, probE, tBuff, dlay, bn]
+    rows.append(row)
+writer.writerows(row)
+
