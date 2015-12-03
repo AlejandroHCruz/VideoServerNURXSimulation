@@ -18,7 +18,7 @@ probServerSaturationLimit = .05     # to answer question 2 {.05, .01, .001}
 fixedUsers = 5                      # to answer question 2 {5, 10, 15, 20}
 
 # fixed
-simulationTime = 10                 # Time the simulation will run
+simulationTime = 40                 # Time the simulation will run
 Lambda = 0.5                        # rate of requests entering the system every second (1/tp)
 requestArrivalTime = 1/Lambda       # Average time between any user request (tp = 2)
 waitTimeMax = 1                     # U. 1 second in seconds
@@ -39,7 +39,7 @@ bandwidthMaxInPackages = 4500
 # === Variables ===
 
 # time
-time = 40                           # current simulation time in seconds
+time = 0                            # current simulation time in seconds
 serviceTimePackage = 0              # total service time in seconds (occupation time)
 serviceTimeFrame = 0                # total service time in seconds (occupation time)
 serviceTimeUser = 0                 # total service time in seconds (occupation time)
@@ -166,17 +166,17 @@ amazonDelaysArr = []                # Amazon delays from the .csv file
 bandwidthArr = []                   # bits transferred every second
 
 # Read Amazon delay data from csv file
-delaysReader = csv.reader(open('/mnt/5512B8C217C7CAC1/Dropbox/Desarrollo/Python/VideoServerNURXSimulation/rsc/AmazonS3_delays-Ag-15.csv', 'rb'), delimiter= ',', quotechar='"')
+delaysReader = csv.reader(open('AmazonS3_delays-Ag-15.csv', 'rb'), delimiter= ',', quotechar='"')
 for i in delaysReader:
     amazonDelaysArr.append(i)
 
-framesReader = csv.reader(open('/mnt/5512B8C217C7CAC1/Dropbox/Desarrollo/Python/VideoServerNURXSimulation/rsc/Terse_DieHardIII.csv', 'rb'), delimiter= ',', quotechar='"')
+framesReader = csv.reader(open('Terse_DieHardIII.csv', 'rb'), delimiter= ',', quotechar='"')
 for i in framesReader:
     framesOriginalArray.append(i)
 
 # ====== Main ======
 
-while (time < simulationTime) and ((usersSuccess/usersServed < frameMinSuccessRate) or (usersServed == 0)):
+while (time < simulationTime) and ((usersServed == 0) or (usersSuccess/usersServed < frameMinSuccessRate)):
 
     # save system's status (saving this might be too much data and we should save it every .01 seconds)
     usersInSystemArr.append(usersInSystem)
