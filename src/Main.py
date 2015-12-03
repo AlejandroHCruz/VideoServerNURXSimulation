@@ -13,16 +13,16 @@ import numpy as np  # install in your computer: http://stackoverflow.com/questio
 # change to test different simulation results
 eDividedByK = .001                  # to answer question 1 {.001, .01, .1}
 frameMinSuccessRate = .9            # to answer question 1 {.9, .95, .99}
-bufferSizeInPackages = 50           # to answer question 2 {50, 100, 250 & 500 } (n)
+bufferSizeInPackages = 50           # to answer question 1 {50, 100, 250 & 500 } (n)
 probServerSaturationLimit = .05     # to answer question 2 {.05, .01, .001}
 fixedUsers = 5                      # to answer question 2 {5, 10, 15, 20}
 
 # fixed
-simulationTime = 600                # Time the simulation will run
+simulationTime = 10                 # Time the simulation will run
 Lambda = 0.5                        # rate of requests entering the system every second (1/tp)
 requestArrivalTime = 1/Lambda       # Average time between any user request (tp = 2)
 waitTimeMax = 1                     # U. 1 second in seconds
-packagesTobeServedPerUser = 2000    # number of packages that every user receives
+framesTobeServedPerUser = 2000      # number of frames that every user receives
 throughputPackages = 4500           # rate of packages leaving the buffer every second (Miu)
 packageLeavesBufferTime = round(1/throughputPackages, 6)  # Average time in which a package leaves the buffer(.000222)
 randomFrameRangeMin = 10            # Used to choose the start of the frames to be sent to any user (randrange)
@@ -39,9 +39,9 @@ bandwidthMaxInPackages = 4500
 # === Variables ===
 
 # time
-time = 1.9                          # current simulation time in seconds
-serviceTimePackage = 0                 # total service time in seconds (occupation time)
-serviceTimeFrame = 0                 # total service time in seconds (occupation time)
+time = 40                           # current simulation time in seconds
+serviceTimePackage = 0              # total service time in seconds (occupation time)
+serviceTimeFrame = 0                # total service time in seconds (occupation time)
 serviceTimeUser = 0                 # total service time in seconds (occupation time)
 
 # users
@@ -109,7 +109,7 @@ amazonCurrentDelayIndex = 0         # used to read the delay from the delays arr
 # utilization
 utilizationUser = 0                 # percentage of utilization of the system
 utilizationFrame = 0                # percentage of utilization of the system
-utilizationPackage = 0                 # percentage of utilization of the system
+utilizationPackage = 0              # percentage of utilization of the system
 
 
 # bandwidth
@@ -176,7 +176,7 @@ for i in framesReader:
 
 # ====== Main ======
 
-while time < simulationTime:  # Run simulation for "10 minutes"
+while (time < simulationTime) and ((usersSuccess/usersServed < frameMinSuccessRate) or (usersServed == 0)):
 
     # save system's status (saving this might be too much data and we should save it every .01 seconds)
     usersInSystemArr.append(usersInSystem)
@@ -203,6 +203,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         print time, ": user added. Total: ", usersInSystem
         arrivalTimeUsersArr.append(time)
         usersFullyDeliveredArr.append("no")
+        usersAcceptedInBufferArr.append("-")
+        departureTimeUsersArr.append("-")
         framesDeliveredPerUserArr.append(0)
         startStreamingPositionPerUser.append(random.randrange(randomFrameRangeMin, randomFrameRangeMax))
         currentFramePerUserIndex.append(0)
@@ -216,7 +218,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         if usersBeingServed < wifiUserLimit:  # serve only 256 users
             # find next user that needs one of her 2000 frames
             for index, item in enumerate(framesDeliveredPerUserArr):
-                if item <= packagesTobeServedPerUser and index > currentUserIndex:
+                if item <= framesTobeServedPerUser and index > currentUserIndex:
                     currentUserIndex = index
 
         # get index of next currentFrame for current user
@@ -236,6 +238,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         currentFrameSize = framesOriginalArray[currentFrameStreamingIndex]
         currentFrameSize = np.int32(currentFrameSize)
         arrivalTimeFramesArr.append(time)
+        departureTimeFramesArr.append("-")
         packagesServedPerFrameArr.append(0)
         framesFullyDeliveredArr.append("no")
         frameOwnersArr.append(currentUserIndex)
@@ -261,6 +264,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
             frameOfEveryPackage.append(currentFrameIndex)
             packageOwnersArr.append(currentUserIndex)
             arrivalTimePackagesArr.append(time)
+            departureTimePackagesArray.append("-")
+            packagesDeliveryStatusArr.append("-")
             packs += 1
 
         # save data for last package of the frame
@@ -268,6 +273,8 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         frameOfEveryPackage.append(currentFrameIndex)
         packageOwnersArr.append(currentUserIndex)
         arrivalTimePackagesArr.append(time)
+        departureTimePackagesArray.append("-")
+        packagesDeliveryStatusArr.append("-")
 
         if delay > 1 and packagesInSystem+numPackagesOfCurrentFrame < bufferSizeInPackages:
             # reject the frame
@@ -275,6 +282,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
             framesFailed += 1
             framesRejectedFromBuffer += 1
             framesAcceptedInBufferArr.append("rejected")
+            usersAcceptedInBufferArr[currentUserIndex] = "rejected"
 
             rej = 0
             # mark all the packages of this frame as rejected and failed
@@ -282,7 +290,6 @@ while time < simulationTime:  # Run simulation for "10 minutes"
                 print time, ":", numPackagesOfCurrentFrame, " Packages rejected. Total: ", packagesInSystem
                 packagesRejectedFromBuffer += 1
                 packagesAcceptedInBufferArr.append("rejected")
-                packagesDeliveryStatusArr.append("-")
                 rej += 1
 
         else:
@@ -322,7 +329,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
             inx += 1
 
         # remove package from system
-        departureTimePackagesArray.append(time)
+        departureTimePackagesArray[currentPackageIndex] = time
         packagesInSystem -= 1
         print time, ": Package served. Total: ", packagesInSystem
         packagesServed += 1
@@ -357,7 +364,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
         e = eDividedByK*usersInSystem
         randomE = round(random.uniform(0, 1), 4)  # probability with 4 decimals
         if randomE > e:
-            packagesDeliveryStatusArr.append("delivered")
+            packagesDeliveryStatusArr[currentPackageIndex] = "delivered"
             packagesDelivered += 1
             packagesSuccess += 1
 
@@ -368,7 +375,7 @@ while time < simulationTime:  # Run simulation for "10 minutes"
             if usersFullyDeliveredArr[currentUserIndex] is not "no":
                 usersFullyDeliveredArr[currentUserIndex] = "yes"
         else:
-            packagesDeliveryStatusArr.append("failed")
+            packagesDeliveryStatusArr[currentPackageIndex] = "failed"
             packagesFailed += 1
             packagesNotDelivered += 1
             # tag package's frame
@@ -402,13 +409,13 @@ while time < simulationTime:  # Run simulation for "10 minutes"
             framesDeliveredPerUserArr[currentUserIndex] = fdpu
 
             # When the system has already sent 2000 frames to the current user
-            if fdpu == packagesTobeServedPerUser:
+            if fdpu == framesTobeServedPerUser:
 
                 print time, ": User served. Total: ", usersInSystem
                 # remove user from system
                 usersServed += 1
                 usersInSystem -= 1
-                departureTimeUsersArr.append(time)
+                departureTimeUsersArr[currentUserIndex] = time
                 # compute service time
                 serviceTimeUser += time - arrivalTimeUsersArr[currentUserIndex]
                 # tag user's delivery status
@@ -417,6 +424,9 @@ while time < simulationTime:  # Run simulation for "10 minutes"
                     usersSuccess += 1
                 else:
                     usersFailed += 1
+                if usersAcceptedInBufferArr[currentUserIndex] != "rejected":
+                    usersAcceptedInBufferArr[currentUserIndex] = "accepted"
+                    usersAcceptedInBuffer += 1
 
     # Compute G
     if packagesServed > 0:
@@ -441,15 +451,16 @@ utilizationUser = serviceTimeUser/time
 
 # ======= Print all csv files ======
 
+rows = []
+
 with open("general_info.csv", "w") as f:
     writer = csv.writer(f)
     row = [time, usersInSystem, usersServed, usersSuccess, usersFailed, usersAcceptedInBuffer, usersRejectedFromBuffer, usersDelivered, usersNotDelivered, usersBeingServed, lu, lf, lp, utilizationPackage, utilizationFrame, utilizationUser]
-    writer.writerows(row)
+    rows.append(row)
+    writer.writerows(rows)
 
-rows = []
-
-with open("users.csv", "w") as f:
-    writer = csv.writer(f)
+with open("users.csv", "w") as g:
+    writer = csv.writer(g)
     for index, t in enumerate(arrivalTimeUsersArr):
             arrTUsr = arrivalTimeUsersArr[index]
             depTUsr = departureTimeUsersArr[index]
@@ -460,51 +471,52 @@ with open("users.csv", "w") as f:
             fullDeliv = usersFullyDeliveredArr[index]
             row = [arrTUsr, depTUsr, startStr, frDeliv, currFr, accBuff, fullDeliv]
             rows.append(row)
-    writer.writerows(row)
+    writer.writerows(rows)
 
-with open("frames.csv", "w") as f:
-    writer = csv.writer(f)
+with open("frames.csv", "w") as h:
+    writer = csv.writer(h)
     for index, t in enumerate(arrivalTimeFramesArr):
         arrTFr = arrivalTimeFramesArr[index]
         depTFr = departureTimeFramesArr[index]
-        frameIndx = framesArray[index]
+        # frameIndx = framesArray[index]
         frSize = frameSizeArr[index]
         owner = frameOwnersArr[index]
         accBuff = framesAcceptedInBufferArr[index]
         fullDeliv = framesFullyDeliveredArr[index]
         packsFr = packagesPerFrameArr[index]
         packsServFr = packagesServedPerFrameArr[index]
-        row = [arrTFr, depTFr, frameIndx, frSize, owner, accBuff, fullDeliv, packsFr, packsServFr]
+        row = [arrTFr, depTFr, frSize, owner, accBuff, fullDeliv, packsFr, packsServFr]
         rows.append(row)
-    writer.writerows(row)
+    writer.writerows(rows)
 
-with open("packages.csv", "w") as f:
-    writer = csv.writer(f)
+with open("packages.csv", "w") as i:
+    writer = csv.writer(i)
     for index, t in enumerate(arrivalTimePackagesArr):
         arrTPack = arrivalTimePackagesArr[index]
         depTPack = departureTimePackagesArray[index]
-        packageIndx = packagesArray[index]
+        # packageIndx = packagesArray[index]
         packSize = packageSizeArr[index]
         owner = packageOwnersArr[index]
         accBuff = packagesAcceptedInBufferArr[index]
         deliverySts = packagesDeliveryStatusArr[index]
-        row = [arrTPack, depTPack, packageIndx, packSize, owner, accBuff, deliverySts]
+        row = [arrTPack, depTPack, packSize, owner, accBuff, deliverySts]
         rows.append(row)
-    writer.writerows(row)
+    writer.writerows(rows)
 
-with open("every_microsecond_data.csv", "w") as f:
-    writer = csv.writer(f)
-for index, i in enumerate(usersInSystemArr):
-    uinSys = usersInSystemArr[index]
-    uBingServed = usersBeingServed[index]
-    frInSys = framesInSystemArr[index]
-    packInSys = packagesInSystemArr[index]
-    probG = probabilityServerSaturationArr[index]
-    probE = probabilityPackageSendFailArr[index]
-    tBuff = timeInBufferPerPackageArr[index]
-    dlay = delayArr[index]
-    bn = bandwidthArr[index]
-    row = [uinSys, uBingServed, frInSys, packInSys, probG, probE, tBuff, dlay, bn]
-    rows.append(row)
-writer.writerows(row)
+with open("every_microsecond_data.csv", "w") as j:
+    writer = csv.writer(j)
+    for index, i in enumerate(usersInSystemArr):
+        uinSys = usersInSystemArr[index]
+        uBingServed = usersBeingServedArr[index]
+        frInSys = framesInSystemArr[index]
+        packInSys = packagesInSystemArr[index]
+        probG = probabilityServerSaturationArr[index]
+        probE = probabilityPackageSendFailArr[index]
+        tBuff = timeInBufferPerPackageArr[index]
+        dlay = delayArr[index]
+        bn = bandwidthArr[index]
+        row = [uinSys, uBingServed, frInSys, packInSys, probG, probE, tBuff, dlay, bn]
+        rows.append(row)
+    writer.writerows(rows)
 
+print "END in time: ", time
