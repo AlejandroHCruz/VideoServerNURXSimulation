@@ -14,8 +14,8 @@ import numpy as np  # install in your computer: http://stackoverflow.com/questio
 eDividedByK = .001                  # to answer question 1 {.001, .01, .1}
 bufferSizeInPackages = 3            # to answer question 1 {50, 100, 250 & 500 } (n)
 frameMinSuccessRate = .9            # to answer question 1 {.9, .95, .99}
-probServerSaturationLimit = .001    # to answer question 2 {.05, .01, .001}
-fixedUsers = 20                     # to answer question 2 {5, 10, 15, 20}
+probServerSaturationLimit = .01     # to answer question 2 {.05, .01, .001}
+fixedUsers = 15                     # to answer question 2 {5, 10, 15, 20}
 
 # fixed
 simulationTime = 30                 # Time the simulation will run
