@@ -12,13 +12,13 @@ import numpy as np  # install in your computer: http://stackoverflow.com/questio
 
 # change to test different simulation results
 eDividedByK = .001                  # to answer question 1 {.001, .01, .1}
-frameMinSuccessRate = .9            # to answer question 1 {.9, .95, .99}
 bufferSizeInPackages = 50           # to answer question 1 {50, 100, 250 & 500 } (n)
+frameMinSuccessRate = .9            # to answer question 1 {.9, .95, .99}
 probServerSaturationLimit = .05     # to answer question 2 {.05, .01, .001}
 fixedUsers = 5                      # to answer question 2 {5, 10, 15, 20}
 
 # fixed
-simulationTime = 40                 # Time the simulation will run
+simulationTime = 60                 # Time the simulation will run
 Lambda = 0.5                        # rate of requests entering the system every second (1/tp)
 requestArrivalTime = 1/Lambda       # Average time between any user request (tp = 2)
 waitTimeMax = 1                     # U. 1 second in seconds
@@ -39,7 +39,7 @@ bandwidthMaxInPackages = 4500
 # === Variables ===
 
 # time
-time = 0                            # current simulation time in seconds
+time = 1.9                          # current simulation time in seconds
 serviceTimePackage = 0              # total service time in seconds (occupation time)
 serviceTimeFrame = 0                # total service time in seconds (occupation time)
 serviceTimeUser = 0                 # total service time in seconds (occupation time)
@@ -176,7 +176,7 @@ for i in framesReader:
 
 # ====== Main ======
 
-while (time < simulationTime) and ((usersServed == 0) or (usersSuccess/usersServed < frameMinSuccessRate)):
+while time < simulationTime:
 
     # save system's status (saving this might be too much data and we should save it every .01 seconds)
     usersInSystemArr.append(usersInSystem)
