@@ -12,7 +12,7 @@ import numpy as np  # install in your computer: http://stackoverflow.com/questio
 
 # change to test different simulation results
 eDividedByK = .001                  # to answer question 1 {.001, .01, .1}
-bufferSizeInPackages = 50           # to answer question 1 {50, 100, 250 & 500 } (n)
+bufferSizeInPackages = 500           # to answer question 1 {50, 100, 250 & 500 } (n)
 frameMinSuccessRate = .9            # to answer question 1 {.9, .95, .99}
 probServerSaturationLimit = .05     # to answer question 2 {.05, .01, .001}
 fixedUsers = 5                      # to answer question 2 {5, 10, 15, 20}
@@ -39,7 +39,7 @@ bandwidthMaxInPackages = 4500
 # === Variables ===
 
 # time
-time = 1.9                          # current simulation time in seconds
+time = 0                            # current simulation time in seconds
 serviceTimePackage = 0              # total service time in seconds (occupation time)
 serviceTimeFrame = 0                # total service time in seconds (occupation time)
 serviceTimeUser = 0                 # total service time in seconds (occupation time)
@@ -460,7 +460,7 @@ with open("general_info.csv", "w") as f:
     writer.writerows(rows)
 
 with open("users.csv", "w") as g:
-    writer = csv.writer(g)
+    writer0 = csv.writer(g)
     for index, t in enumerate(arrivalTimeUsersArr):
             arrTUsr = arrivalTimeUsersArr[index]
             depTUsr = departureTimeUsersArr[index]
@@ -471,10 +471,10 @@ with open("users.csv", "w") as g:
             fullDeliv = usersFullyDeliveredArr[index]
             row = [arrTUsr, depTUsr, startStr, frDeliv, currFr, accBuff, fullDeliv]
             rows.append(row)
-    writer.writerows(rows)
+    writer0.writerows(rows)
 
 with open("frames.csv", "w") as h:
-    writer = csv.writer(h)
+    writer1 = csv.writer(h)
     for index, t in enumerate(arrivalTimeFramesArr):
         arrTFr = arrivalTimeFramesArr[index]
         depTFr = departureTimeFramesArr[index]
@@ -487,10 +487,10 @@ with open("frames.csv", "w") as h:
         packsServFr = packagesServedPerFrameArr[index]
         row = [arrTFr, depTFr, frSize, owner, accBuff, fullDeliv, packsFr, packsServFr]
         rows.append(row)
-    writer.writerows(rows)
+    writer1.writerows(rows)
 
 with open("packages.csv", "w") as i:
-    writer = csv.writer(i)
+    writer2 = csv.writer(i)
     for index, t in enumerate(arrivalTimePackagesArr):
         arrTPack = arrivalTimePackagesArr[index]
         depTPack = departureTimePackagesArray[index]
@@ -501,10 +501,10 @@ with open("packages.csv", "w") as i:
         deliverySts = packagesDeliveryStatusArr[index]
         row = [arrTPack, depTPack, packSize, owner, accBuff, deliverySts]
         rows.append(row)
-    writer.writerows(rows)
+    writer2.writerows(rows)
 
 with open("every_microsecond_data.csv", "w") as j:
-    writer = csv.writer(j)
+    writer3 = csv.writer(j)
     for index, i in enumerate(usersInSystemArr):
         uinSys = usersInSystemArr[index]
         uBingServed = usersBeingServedArr[index]
@@ -517,6 +517,6 @@ with open("every_microsecond_data.csv", "w") as j:
         bn = bandwidthArr[index]
         row = [uinSys, uBingServed, frInSys, packInSys, probG, probE, tBuff, dlay, bn]
         rows.append(row)
-    writer.writerows(rows)
+    writer3.writerows(rows)
 
 print "END in time: ", time
